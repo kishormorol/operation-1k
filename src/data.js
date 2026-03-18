@@ -226,8 +226,8 @@ export const ROUTINE = {
   Mon: [
     {t:"7:30",l:"Wake · Breakfast",c:"#333"},{t:"8:00",l:"GYM (1.5h)",c:"#F59E0B"},
     {t:"9:30",l:"LeetCode (2.5h)",c:"#EF4444"},{t:"12:00",l:"ML/LLM Theory (1.25h)",c:"#3B82F6"},
-    {t:"1:30",l:"Drive → Stony Brook",c:"#52525B"},{t:"3:00",l:"Campus study (1h)",c:"#3B82F6"},
-    {t:"5:00",l:"CLASS",c:"#FBBF24"},{t:"6:20",l:"Drive → NYC",c:"#52525B"},
+    {t:"1:30",l:"Commute to class",c:"#52525B"},{t:"3:00",l:"Study (1h)",c:"#3B82F6"},
+    {t:"5:00",l:"CLASS",c:"#FBBF24"},{t:"6:20",l:"Commute back",c:"#52525B"},
     {t:"8:00",l:"Dinner",c:"#333"},{t:"8:20",l:"DEEP BUILD (3h)",c:"#10B981"},
     {t:"11:30",l:"WALK (30m)",c:"#06B6D4"},{t:"12:00",l:"Light review",c:"#EF4444"},{t:"12:30",l:"Sleep",c:"#222"},
   ],
@@ -242,8 +242,8 @@ export const ROUTINE = {
   Wed: [
     {t:"7:30",l:"Wake · Breakfast",c:"#333"},{t:"8:00",l:"GYM (1.5h)",c:"#F59E0B"},
     {t:"9:30",l:"LeetCode (2.5h)",c:"#EF4444"},{t:"12:00",l:"ML/LLM Theory (1.25h)",c:"#3B82F6"},
-    {t:"1:30",l:"Drive → Stony Brook",c:"#52525B"},{t:"3:00",l:"Campus study (1h)",c:"#3B82F6"},
-    {t:"5:00",l:"CLASS",c:"#FBBF24"},{t:"6:20",l:"Drive → NYC",c:"#52525B"},
+    {t:"1:30",l:"Commute to class",c:"#52525B"},{t:"3:00",l:"Study (1h)",c:"#3B82F6"},
+    {t:"5:00",l:"CLASS",c:"#FBBF24"},{t:"6:20",l:"Commute back",c:"#52525B"},
     {t:"8:00",l:"Dinner",c:"#333"},{t:"8:20",l:"DEEP BUILD (3h)",c:"#10B981"},
     {t:"11:30",l:"WALK (30m)",c:"#06B6D4"},{t:"12:00",l:"Light review",c:"#EF4444"},{t:"12:30",l:"Sleep",c:"#222"},
   ],
