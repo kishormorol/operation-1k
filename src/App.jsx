@@ -7,6 +7,39 @@ const today = () => new Date().toISOString().split('T')[0];
 const todayDay = () => DAY_NAMES[new Date().getDay()];
 const QUICK_MINS = [10, 15, 20, 30, 45, 60, 90, 120];
 
+// Start date: March 23, 2026 (Monday) = Week 1 Day 1
+// March 18-22 is Week 0 (setup)
+const PLAN_START = new Date(2026, 2, 23); // Month is 0-indexed, so 2 = March
+const DAY_MAP = { Mon:0, Tue:1, Wed:2, Thu:3, Fri:4, Sat:5, Sun:6 };
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+const getWeekDates = (weekIndex) => {
+  // weekIndex 0 = Week 1 in WEEKS_DATA (id:1), starts Mar 23
+  const weekStart = new Date(PLAN_START);
+  weekStart.setDate(weekStart.getDate() + weekIndex * 7);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + 6);
+  return {
+    start: `${MONTHS[weekStart.getMonth()]} ${weekStart.getDate()}`,
+    end: `${MONTHS[weekEnd.getMonth()]} ${weekEnd.getDate()}`,
+  };
+};
+
+const getDayDate = (weekIndex, dayName) => {
+  const offset = DAY_MAP[dayName] || 0;
+  const date = new Date(PLAN_START);
+  date.setDate(date.getDate() + weekIndex * 7 + offset);
+  return `${MONTHS[date.getMonth()]} ${date.getDate()}`;
+};
+
+const isToday = (weekIndex, dayName) => {
+  const offset = DAY_MAP[dayName] || 0;
+  const date = new Date(PLAN_START);
+  date.setDate(date.getDate() + weekIndex * 7 + offset);
+  const now = new Date();
+  return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate();
+};
+
 const fmtTime = (m) => {
   if (!m) return '';
   if (m < 60) return `${m}m`;
@@ -71,7 +104,7 @@ export default function App() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 10 }}>
         <div>
-          <div style={{ fontSize: 7, color: '#27272A', letterSpacing: 4, textTransform: 'uppercase', fontWeight: 700 }}>4-Week Plan</div>
+          <div style={{ fontSize: 7, color: '#27272A', letterSpacing: 4, textTransform: 'uppercase', fontWeight: 700 }}>26-Week Plan · Mar 18 – Sep 20</div>
           <h1 style={{ fontFamily: "'Outfit',sans-serif", fontSize: 26, fontWeight: 900, color: '#FAFAFA', letterSpacing: -2, lineHeight: .9 }}>Operation 1K</h1>
         </div>
         <div style={{ textAlign: 'right' }}>
@@ -106,22 +139,27 @@ export default function App() {
       {/* PLAN */}
       {view === 'plan' && (
         <div>
-          <div style={{ display: 'flex', gap: 4, marginBottom: 12 }}>
+          <div style={{ display: 'flex', gap: 4, marginBottom: 12, overflowX: 'auto', paddingBottom: 4 }}>
             {WEEKS_DATA.map((w, i) => {
               const p = getWeekProg(i); const on = i === selWeek;
+              const wd = getWeekDates(i);
               return (
                 <div key={i} onClick={() => { setSelWeek(i); setSelDay(null); }}
-                  style={{ flex: 1, cursor: 'pointer', padding: '8px 6px', borderRadius: 8, textAlign: 'center', background: on ? w.accent + '10' : 'transparent', border: `1px solid ${on ? w.accent + '30' : 'transparent'}` }}>
-                  <div style={{ fontFamily: "'Outfit'", fontSize: 12, fontWeight: 800, color: on ? w.accent : '#333' }}>W{w.id}</div>
-                  <div style={{ fontSize: 7, color: on ? w.accent + '80' : '#222' }}>{p.pct}%</div>
+                  style={{ cursor: 'pointer', padding: '6px 8px', borderRadius: 8, textAlign: 'center', background: on ? w.accent + '10' : 'transparent', border: `1px solid ${on ? w.accent + '30' : 'transparent'}`, minWidth: 52, flexShrink: 0 }}>
+                  <div style={{ fontFamily: "'Outfit'", fontSize: 11, fontWeight: 800, color: on ? w.accent : '#333' }}>W{w.id}</div>
+                  <div style={{ fontSize: 6, color: on ? w.accent + '55' : '#1A1A1E', marginTop: 1 }}>{wd.start}</div>
+                  <div style={{ fontSize: 7, color: on ? w.accent + '80' : '#222', marginTop: 1 }}>{p.pct}%</div>
                   {p.mins > 0 && <div style={{ fontSize: 6, color: '#10B981', marginTop: 1 }}>{fmtTime(p.mins)}</div>}
                   <div style={{ height: 2, background: '#17171B', borderRadius: 1, marginTop: 3, overflow: 'hidden' }}><div style={{ height: '100%', background: w.accent, width: `${p.pct}%` }} /></div>
                 </div>
               );
             })}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-            <span style={{ fontFamily: "'Outfit'", fontSize: 14, fontWeight: 700, color: '#FAFAFA' }}>{week.title}</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
+            <div>
+              <span style={{ fontFamily: "'Outfit'", fontSize: 14, fontWeight: 700, color: '#FAFAFA' }}>{week.title}</span>
+              <div style={{ fontSize: 8, color: '#333', marginTop: 2 }}>{getWeekDates(selWeek).start} – {getWeekDates(selWeek).end} · Month {week.month}</div>
+            </div>
             <span style={{ fontSize: 7, color: '#27272A' }}>{getWeekProg(selWeek).done}/{getWeekProg(selWeek).total}</span>
           </div>
 
@@ -131,12 +169,16 @@ export default function App() {
             const isOpen = selDay === di;
             const allDone = dayDone === d.tasks.length && d.tasks.length > 0;
             const nd = d.tag.includes('NO');
+            const dayDate = getDayDate(selWeek, d.day);
+            const isTodayDay = isToday(selWeek, d.day);
             return (
-              <div key={di} style={{ marginBottom: 4, border: `1px solid ${isOpen ? week.accent + '25' : '#141416'}`, borderRadius: 8, overflow: 'hidden' }}>
+              <div key={di} style={{ marginBottom: 4, border: `1px solid ${isTodayDay ? '#FBBF2440' : isOpen ? week.accent + '25' : '#141416'}`, borderRadius: 8, overflow: 'hidden', background: isTodayDay ? '#FBBF2405' : 'transparent' }}>
                 <div onClick={() => setSelDay(isOpen ? null : di)} style={{ padding: '10px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontFamily: "'Outfit'", fontSize: 12, fontWeight: 700, color: isOpen ? week.accent : '#52525B', width: 30 }}>{d.day}</span>
+                    <span style={{ fontFamily: "'Outfit'", fontSize: 12, fontWeight: 700, color: isTodayDay ? '#FBBF24' : isOpen ? week.accent : '#52525B', width: 30 }}>{d.day}</span>
+                    <span style={{ fontSize: 8, color: isTodayDay ? '#FBBF24' : '#444', fontWeight: 500 }}>{dayDate}</span>
                     <span style={{ fontSize: 7, padding: '2px 5px', borderRadius: 3, background: nd ? '#22D3EE08' : '#FB718508', color: nd ? '#22D3EE' : '#FB7185', fontWeight: 600 }}>{d.tag}</span>
+                    {isTodayDay && <span style={{ fontSize: 6, padding: '1px 4px', borderRadius: 3, background: '#FBBF2420', color: '#FBBF24', fontWeight: 700 }}>TODAY</span>}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     {dayMins > 0 && <span style={{ fontSize: 7, color: '#10B981', fontWeight: 600 }}>⏱{fmtTime(dayMins)}</span>}
