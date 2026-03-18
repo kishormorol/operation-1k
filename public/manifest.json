@@ -1,0 +1,9 @@
+{
+  "name": "Operation 1K",
+  "short_name": "Op1K",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#08080A",
+  "theme_color": "#08080A",
+  "icons": []
+}
