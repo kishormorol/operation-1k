@@ -168,7 +168,7 @@ export default function App() {
             const dayMins = d.tasks.reduce((s, t) => s + (mins[t.id] || 0), 0);
             const isOpen = selDay === di;
             const allDone = dayDone === d.tasks.length && d.tasks.length > 0;
-            const nd = d.tag.includes('NO');
+            const nd = d.tag.includes('FREE');
             const dayDate = getDayDate(selWeek, d.day);
             const isTodayDay = isToday(selWeek, d.day);
             return (
@@ -236,7 +236,7 @@ export default function App() {
           })}
           <div style={{ marginTop: 12, padding: '8px 12px', background: '#22D3EE06', border: '1px solid #22D3EE12', borderRadius: 8 }}>
             <div style={{ color: '#22D3EE', fontWeight: 700, fontSize: 9 }}>🔑 KEY</div>
-            <div style={{ color: '#52525B', fontSize: 10, lineHeight: 1.5 }}>{curDay === 'Mon' || curDay === 'Wed' ? 'NO DRIVING. 8:20-11:20 PM = golden 3 hours.' : curDay === 'Sat' || curDay === 'Sun' ? 'Sprint 9:30-11:45 before driving. Push 8:20-11:20 after.' : 'Build hard before driving starts.'}</div>
+            <div style={{ color: '#52525B', fontSize: 10, lineHeight: 1.5 }}>{curDay === 'Mon' || curDay === 'Wed' ? 'FREE EVENING. 8:20-11:20 PM = golden 3 hours.' : curDay === 'Sat' || curDay === 'Sun' ? 'Sprint 9:30-11:45 before lab. Push 8:20-11:20 after.' : 'Build hard before lab starts.'}</div>
           </div>
         </div>
       )}

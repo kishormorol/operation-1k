@@ -21,7 +21,7 @@ A personal study tracker built to mass 1,000 hours of focused learning in 6 mont
 
 - **Plan** — 26 scrollable weeks, each broken into 7 days with checkable tasks. Every LeetCode problem links directly to the problem page. Every resource links to the doc/tutorial/video.
 - **Time Tracking** — When you complete a task, log how many minutes it took. See time per task, per day, per week, and per category.
-- **Routine** — Auto-detects today and shows the daily schedule (gym, study blocks, class, driving, walk).
+- **Routine** — Auto-detects today and shows the daily schedule (gym, study blocks, class, lab work, walk).
 - **Stats** — Progress by week, by category (DSA, ML, LLM, BUILD, DESIGN, MOCK), total hours, time tracked.
 - **Dates** — Every day shows the exact calendar date. Today is highlighted. Week tabs show date ranges.
 - **Persistent** — All data saved in localStorage. Survives refreshes.
