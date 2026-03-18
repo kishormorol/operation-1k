@@ -50,15 +50,12 @@ const fmtTime = (m) => {
 
 export default function App() {
   const [done, setDone] = useStorage('done', {});
-  const [hrs, setHrs] = useStorage('hrs', {});
   const [mins, setMins] = useStorage('mins', {});
   const [view, setView] = useState('plan');
   const [selWeek, setSelWeek] = useState(0);
   const [selDay, setSelDay] = useState(null);
   const [timeModal, setTimeModal] = useState(null);
   const [customMin, setCustomMin] = useState('');
-
-  const td = today();
 
   const toggle = (id) => {
     const u = { ...done };
@@ -78,14 +75,19 @@ export default function App() {
   };
 
   const skipTime = () => { setTimeModal(null); setCustomMin(''); };
-  const logH = (h) => setHrs({ ...hrs, [td]: h });
 
   const allTasks = useMemo(() => WEEKS_DATA.flatMap(w => w.days.flatMap(d => d.tasks)), []);
   const doneCount = allTasks.filter(t => done[t.id]).length;
   const totalTasks = allTasks.length;
   const taskPct = totalTasks ? Math.round(doneCount / totalTasks * 100) : 0;
-  const totH = Object.values(hrs).reduce((s, v) => s + v, 0);
   const totalMins = Object.values(mins).reduce((s, v) => s + v, 0);
+  const totalHours = Math.floor(totalMins / 60);
+  const totalRemMins = totalMins % 60;
+
+  // Today's stats — tasks completed today with their times
+  const todayTs = new Date().setHours(0,0,0,0);
+  const todayTasks = allTasks.filter(t => done[t.id] && new Date(done[t.id]).setHours(0,0,0,0) === todayTs);
+  const todayMins = todayTasks.reduce((s, t) => s + (mins[t.id] || 0), 0);
 
   const getWeekProg = (wi) => {
     const ts = WEEKS_DATA[wi].days.flatMap(d => d.tasks);
@@ -108,24 +110,29 @@ export default function App() {
           <h1 style={{ fontFamily: "'Outfit',sans-serif", fontSize: 26, fontWeight: 900, color: '#FAFAFA', letterSpacing: -2, lineHeight: .9 }}>Operation 1K</h1>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontFamily: "'Outfit',sans-serif", fontSize: 24, fontWeight: 900, color: '#FAFAFA', lineHeight: .9 }}>{totH}<span style={{ fontSize: 11, color: '#333' }}>h</span></div>
+          <div style={{ fontFamily: "'Outfit',sans-serif", fontSize: 24, fontWeight: 900, color: '#FAFAFA', lineHeight: .9 }}>{totalHours}<span style={{ fontSize: 11, color: '#333' }}>h</span>{totalRemMins > 0 && <span style={{ fontSize: 13, color: '#52525B' }}> {totalRemMins}m</span>}</div>
           <div style={{ fontSize: 7, color: '#27272A' }}>{doneCount}/{totalTasks} · {taskPct}%</div>
-          {totalMins > 0 && <div style={{ fontSize: 7, color: '#10B981', marginTop: 1 }}>⏱ {fmtTime(totalMins)} tracked</div>}
         </div>
       </div>
 
       {/* Progress */}
-      <div style={{ height: 4, background: '#131316', borderRadius: 2, overflow: 'hidden', marginBottom: 8 }}>
+      <div style={{ height: 4, background: '#131316', borderRadius: 2, overflow: 'hidden', marginBottom: 6 }}>
         <div style={{ height: '100%', borderRadius: 2, width: `${taskPct}%`, transition: 'width .5s', background: 'linear-gradient(90deg,#EF4444,#F97316,#10B981,#A855F7)' }} />
       </div>
 
-      {/* Hour logger */}
-      <div style={{ background: '#0C0C0F', borderRadius: 8, padding: '8px 10px', marginBottom: 8, border: '1px solid #17171B', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div><div style={{ fontSize: 7, color: '#27272A' }}>Today</div><span style={{ fontFamily: "'Outfit'", fontSize: 18, fontWeight: 800, color: '#FAFAFA' }}>{hrs[td] || 0}h</span></div>
-        <div style={{ display: 'flex', gap: 2, flex: 1, justifyContent: 'flex-end' }}>
-          {[0,1,2,3,4,5,6,7,8,9].map(h => (
-            <button key={h} onClick={() => logH(h)} style={{ width: 28, height: 28, borderRadius: 6, border: `1px solid ${hrs[td] === h ? '#FAFAFA' : '#17171B'}`, background: hrs[td] === h ? '#FAFAFA' : 'transparent', color: hrs[td] === h ? '#000' : '#333', fontFamily: 'inherit', fontSize: 10, fontWeight: 600, cursor: 'pointer' }}>{h}</button>
-          ))}
+      {/* Today's auto-calculated stats */}
+      <div style={{ background: '#0C0C0F', borderRadius: 8, padding: '8px 12px', marginBottom: 8, border: '1px solid #17171B', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div>
+            <div style={{ fontSize: 7, color: '#27272A' }}>Today</div>
+            <span style={{ fontFamily: "'Outfit'", fontSize: 16, fontWeight: 800, color: '#FAFAFA' }}>{fmtTime(todayMins) || '0m'}</span>
+          </div>
+          <div style={{ fontSize: 8, color: '#333' }}>{todayTasks.length} tasks done</div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: 7, color: '#27272A' }}>Total</div>
+          <span style={{ fontFamily: "'Outfit'", fontSize: 14, fontWeight: 700, color: totalMins >= 1000*60 ? '#10B981' : '#FAFAFA' }}>{fmtTime(totalMins)}</span>
+          <span style={{ fontSize: 7, color: '#333' }}> / 1000h</span>
         </div>
       </div>
 
@@ -294,7 +301,11 @@ export default function App() {
           })}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginTop: 12 }}>
-            {[{ n: totH, l: 'Hours' }, { n: fmtTime(totalMins) || '0m', l: 'Tracked' }, { n: Object.keys(hrs).length, l: 'Days' }].map(s => (
+            {[
+              { n: `${totalHours}h`, l: 'Total Time' },
+              { n: doneCount, l: 'Tasks Done' },
+              { n: Object.keys(mins).length > 0 ? fmtTime(Math.round(totalMins / Object.keys(mins).length)) : '0m', l: 'Avg / Task' },
+            ].map(s => (
               <div key={s.l} style={{ padding: 8, background: '#0C0C0F', borderRadius: 6, textAlign: 'center', border: '1px solid #141416' }}>
                 <div style={{ fontFamily: "'Outfit'", fontSize: 18, fontWeight: 900, color: '#FAFAFA' }}>{s.n}</div>
                 <div style={{ fontSize: 7, color: '#27272A' }}>{s.l}</div>
@@ -302,7 +313,7 @@ export default function App() {
             ))}
           </div>
 
-          <button onClick={() => { if (confirm('Reset ALL progress?')) { setDone({}); setHrs({}); setMins({}); } }}
+          <button onClick={() => { if (confirm('Reset ALL progress?')) { setDone({}); setMins({}); } }}
             style={{ marginTop: 16, width: '100%', padding: 8, background: 'transparent', border: '1px solid rgba(239,68,68,.12)', borderRadius: 6, color: 'rgba(239,68,68,.3)', fontFamily: 'inherit', fontSize: 9, cursor: 'pointer' }}>
             Reset All Progress
           </button>
